@@ -27,8 +27,6 @@ import java.util.List;
 
 public class NewDataPointDefinitionActivity extends Activity {
 
-    RowAdapter rowAdapter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,29 +34,37 @@ public class NewDataPointDefinitionActivity extends Activity {
 
         final ArrayList<DataPointDefinition> list = new ArrayList<>();
 
-        final ListView listview = (ListView) findViewById(R.id.listView);
+        final LinearLayout linearLayout = (LinearLayout) findViewById(R.id.linearLayout2);
 
         /*adapter = new StableArrayAdapter(this,
                 android.R.layout.simple_list_item_1, list);*/
-        rowAdapter = new RowAdapter(getApplicationContext());
-        listview.setAdapter(rowAdapter);
+
+        final LayoutInflater vi = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         final Button addTextButton = (Button) findViewById(R.id.button7);
         addTextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rowAdapter.add(new TextDataPointDefinition());
-                rowAdapter.notifyDataSetChanged();
-                Log.d("MLEKO", "addText " + String.valueOf(listview.getAdapter().getCount()));
+                View v = vi.inflate(R.layout.text_data_point_definition_layout, null);
+                linearLayout.addView(v);
+                //Log.d("MLEKO", "addText " + String.valueOf(listview.getAdapter().getCount()));
             }
         });
         final Button addOptionsButton = (Button) findViewById(R.id.button8);
         addOptionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                rowAdapter.add(new OptionsDataPointDefinition());
-                rowAdapter.notifyDataSetChanged();
-                Log.d("MLEKO", "addOptions " + String.valueOf(listview.getAdapter().getCount()));
+                final View v = vi.inflate(R.layout.options_data_point_definition_layout, null);
+                Button addOptionButton = v.findViewById(R.id.add_option);
+                final LinearLayout oll = (LinearLayout) v.findViewById(R.id.option_linear_layout);
+                addOptionButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        oll.addView(new EditText(v.getContext()));
+                    }
+                });
+                linearLayout.addView(v);
+                //Log.d("MLEKO", "addOptions " + String.valueOf(listview.getAdapter().getCount()));
             }
         });
     }
@@ -79,7 +85,12 @@ class TextDataPointDefinition extends DataPointDefinition {
 }
 
 class OptionsDataPointDefinition extends DataPointDefinition {
+    @Override
+    public View getView(Context context) {
+        return null;
+    }
 
+    /*
     OptionRowAdapter adapter;
 
     @Override
@@ -103,7 +114,7 @@ class OptionsDataPointDefinition extends DataPointDefinition {
             }
         });
         return v;
-    }
+    }*/
 }
 
 /**
@@ -126,11 +137,9 @@ class RowAdapter extends ArrayAdapter<DataPointDefinition> {
 class Option {
     String option;
     View getView(Context context) {
-        LinearLayout ll = new LinearLayout(context);
-        ll.addView(new EditText(context));
-        ll.addView(new EditText(context));
-        ll.addView(new EditText(context));
-        return ll;
+        EditText et = new EditText(context);
+        et.setHint("option");
+        return et;
     }
 }
 
